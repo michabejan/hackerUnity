@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityStandardAssets.CrossPlatformInput;
-using UnityStandardAssets.Utility;
+
 using Random = UnityEngine.Random;
 
 namespace UnityStandardAssets.Characters.FirstPerson
@@ -58,6 +57,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float currentLerpTime;
 
         private Map map;
+
+        private string orientationInput = "none";
+        private float leftRightTilt = 0;
+        private float upDownTilt = 0;
+        private float inputDirection = 0;
+
+        private float rotationSmoothening = 0.0F;
+        private float rotationSensitivity = 0.0F;
+
         // Use this for initialization
         private void Start()
         {
@@ -158,36 +166,34 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                     elapsedTime = 0;
                     currentLerpTime = 0f;
-                }
-               
-                /*
-                if (transform.position.y < 0)
-                {
-                    f1 = true;
-                    //prevTile = map.tiles[tileIndex];
-                    //nextTile = map.tiles[tileIndex];
-                    
-                   
-                }
-                if (transform.position.y > 2)
-                {
-                    f1 = false;
-                }
-                  
-                if(f1){
-                transform.Translate(Vector3.up * Time.deltaTime);
-                transform.Translate(Vector3.forward * Time.deltaTime);
-                } 
-                if(!f1){
-                transform.Translate(Vector3.down * Time.deltaTime);
-                transform.Translate(Vector3.forward * Time.deltaTime);
-                 */
-                
-            }
-            
-            
+                }                         
+            }                     
         }
 
+        public void receiveInput(string input)
+        {
+            this.orientationInput = input;
+
+            string[] inputParams = input.Split(' ');
+
+            this.leftRightTilt = Convert.ToSingle(inputParams[0]);
+            this.upDownTilt = Convert.ToSingle(inputParams[1]);
+            this.inputDirection = Convert.ToSingle(inputParams[2]);
+
+        }
+
+
+        private void updateCamera()
+        {
+
+
+            // upDownTilt: -90 bis 90
+
+            float tiltAroundZ = (upDownTilt) * this.rotationSensitivity;
+            float tiltAroundX = (leftRightTilt) * this.rotationSensitivity;
+            Quaternion target = Quaternion.Euler(tiltAroundX, tiltAroundZ, 0);
+            this.m_Camera.transform.rotation = Quaternion.Slerp(this.m_Camera.transform.rotation, target, Time.deltaTime * this.rotationSmoothening);
+        }
 
         private void FixedUpdate()
         {
@@ -271,10 +277,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 
 
-            GUI.Label(new Rect(10, 25, 500, 20), "elapsedTime" + elapsedTime);
-            GUI.Label(new Rect(10, 50, 500, 20), "prev : x : " + prevTile.transform.position.x + " " + prevTile.transform.position.y + " " + prevTile.transform.position.z + " ");
-            GUI.Label(new Rect(10, 75, 500, 20), "isOngroud:" + m_CharacterController.isGrounded);
-            GUI.Label(new Rect(10, 100, 500, 20), "difference x :" + (transform.position.x - prevTransformPositionX) + " " + "difference y: "+ (transform.position.z - prevTransformPositionZ));
+            GUI.Label(new Rect(10, 25, 500, 20), "Sensitivity:" + this.rotationSensitivity);
+            GUI.Label(new Rect(10, 50, 500, 20), "Smooth:" + this.rotationSmoothening);
+            GUI.Label(new Rect(10, 100, 500, 20), "difference x :" + (transform.position.x - prevTransformPositionX) + " " + "difference y: " + (transform.position.z - prevTransformPositionZ));
+            GUI.Label(new Rect(10, 125, 500, 20), "leftRight Tilt:" + this.leftRightTilt);
+            GUI.Label(new Rect(10, 150, 500, 20), "upDown Tilt:" + this.upDownTilt);
+
 
             GUI.Box(new Rect(10, 10, Screen.width / 4f, 15), "");
 

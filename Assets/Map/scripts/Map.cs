@@ -5,18 +5,20 @@ using System.Collections.Generic;
 public class Map : MonoBehaviour {
 
     public Tile tilePrefab;
-    public List<Tile> tiles;
+    public List<Tile> tiles = new List<Tile>();
      
     
 
     public void build(int numberOfTiles, float xRange, float zOffset)
     {   
 
-        Tile nextTile = buildFirstTile();
 
+        Tile nextTile = buildFirstTile();
+        
         
         for (int i = 0; i < numberOfTiles; ++i)
         {
+            tiles.Add(nextTile);
             // assign tile from previous iteration as previousTile
             Tile previousTile = nextTile;       
             nextTile = buildNextTile(previousTile, xRange, zOffset);
