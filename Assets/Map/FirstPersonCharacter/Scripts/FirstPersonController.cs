@@ -99,6 +99,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
+        // 1. apply downward movement on player (raus aus update)
+
+        // find origin point
+
+        // target point
+
+        // calculate middle point
+
+        // 
+
+
+
+
         // Update is called once per frame
         private void Update()
         {
@@ -148,16 +161,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     
                     
                     if(nextIndex == 0){
-                        prevTile = gm.Map.tiles[tileIndex];
-                        nextTile = gm.Map.tiles[tileIndex + 1];
-                        tileIndex++;
-                        
-                        heightVec = prevTile.transform.position + ((nextTile.transform.position - prevTile.transform.position)/2) + new Vector3(0, 2, 0);
-                        print("prev : x : " + prevTile.transform.position.x + " " + prevTile.transform.position.y + " " + prevTile.transform.position.z + " ");
-                        print("next : x : " + nextTile.transform.position.x + " " + nextTile.transform.position.y + " " + nextTile.transform.position.z + " ");
-                        print("transform : x : " + heightVec.x + " " + heightVec.y + " " + heightVec.z + " ");
-                        f1 = true;
-                        nextIndex++;
+                        // todo: fixx method
+                        Vector3 middle = findMiddle();
                     }
                     else
                     {
@@ -180,6 +185,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
             this.upDownTilt = Convert.ToSingle(inputParams[1]);
             this.inputDirection = Convert.ToSingle(inputParams[2]);
 
+        }
+
+
+        private Vector3 findMiddle()
+        {
+            prevTile = gm.Map.tiles[tileIndex];
+            nextTile = gm.Map.tiles[tileIndex + 1];
+            tileIndex++;
+
+            heightVec = prevTile.transform.position + ((nextTile.transform.position - prevTile.transform.position) / 2) + new Vector3(0, 2, 0);
+            print("prev : x : " + prevTile.transform.position.x + " " + prevTile.transform.position.y + " " + prevTile.transform.position.z + " ");
+            print("next : x : " + nextTile.transform.position.x + " " + nextTile.transform.position.y + " " + nextTile.transform.position.z + " ");
+            print("transform : x : " + heightVec.x + " " + heightVec.y + " " + heightVec.z + " ");
+            f1 = true;
+            nextIndex++;
+
+            return new Vector3(1, 1, 1);
         }
 
 
