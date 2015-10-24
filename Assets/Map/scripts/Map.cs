@@ -36,6 +36,7 @@ public class Map : MonoBehaviour {
     {
         bool t = true;
         int a = 0;
+        tiles = new List<Tile>();
         for (int i = 0; i < sizeY; i++)
         {
             
@@ -43,6 +44,8 @@ public class Map : MonoBehaviour {
             Tile tile = Instantiate(tilePrefab) as Tile;
             tile.transform.parent = transform;
             tile.transform.localPosition = new Vector3(a, 0f, i*2);
+            print("lalaalalala");
+            tiles.Add(tile);
             /*
             print(a);
             if (t == true)

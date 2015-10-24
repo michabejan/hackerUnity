@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour {
 	void Start () {
         this.BeginGame();
 	}
+    public Map Map
+    {
+        get { return map; }
+    }
 
     private void BeginGame()
     {
