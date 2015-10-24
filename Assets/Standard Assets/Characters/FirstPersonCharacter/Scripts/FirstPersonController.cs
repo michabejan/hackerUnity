@@ -69,7 +69,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float prevTransformPositionZ = 0;
         private int[]difficulty = {0,1,2,3,4};
 
+        private string orientationInput = "none";
+        private float leftRightTilt = 0;
+        private float upDownTilt = 0;
+        private float inputDirection = 0;
 
+        private float rotationSmoothening = 0.0F;
+        private float rotationSensitivity = 0.0F;
 
 
         // Use this for initialization
@@ -101,81 +107,48 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            updateCamera();
+            if (Input.GetKey("up")) this.rotationSmoothening += 0.005F;
+            if (Input.GetKey("down")) this.rotationSmoothening -= 0.005F;
+
+            if (Input.GetKey("left")) this.rotationSensitivity += 0.1F;
+            if (Input.GetKey("right")) this.rotationSensitivity -= 0.1F;
 
 
-            if (Input.GetButtonDown("Jump"))
-            {
-                jumpIndex = 0;
-            }
-            else if (Input.GetKey("a"))
-            {
-                jumpIndex = 1;
-            }
-            else if (Input.GetKey("d"))
-            {
-                jumpIndex = 2;
-            }
 
-
-//            print(Input.GetKey("a"));
-            transform.Translate(jumpVectors[jumpIndex] * Time.deltaTime, Camera.main.transform);
-
-            //RotateView();
-
-            // the jump state needs to read here to make sure it is not missed
-            if (m_CharacterController.isGrounded)
-            {
-                m_Jump = true;
-                prevTransformPositionX = transform.position.x;
-                prevTransformPositionZ = transform.position.z;
-            }
-            else
-            {
-                m_Jump = false;
-            }
-            
         }
 
 
+        public void receiveInput(string input)
+        {
+            this.orientationInput = input;
+
+            string[] inputParams = input.Split(' ');
+
+            this.leftRightTilt = Convert.ToSingle(inputParams[0]);
+            this.upDownTilt = Convert.ToSingle(inputParams[1]);
+            this.inputDirection = Convert.ToSingle(inputParams[2]);
+
+        }
+
+
+        private void updateCamera()
+        {
+            
+
+            // upDownTilt: -90 bis 90
+
+            float tiltAroundZ = (upDownTilt) * this.rotationSensitivity;
+            float tiltAroundX = (leftRightTilt) * this.rotationSensitivity;
+            Quaternion target = Quaternion.Euler(tiltAroundX, tiltAroundZ, 0);
+            this.m_Camera.transform.rotation = Quaternion.Slerp(this.m_Camera.transform.rotation, target, Time.deltaTime * this.rotationSmoothening);
+        }
+
         private void FixedUpdate()
         {
+            
 
 
-            float speed;
-            GetInput(out speed);
-            // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward * m_Input.y + transform.right * m_Input.x;
-
-            // get a normal for the surface that is being touched to move along it
-            RaycastHit hitInfo;
-            Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
-                               m_CharacterController.height / 2f);
-            desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
-
-            m_MoveDir.x = desiredMove.x * speed;
-            m_MoveDir.z = desiredMove.z * speed;
-
-
-            if (m_CharacterController.isGrounded)
-            {
-                m_MoveDir.y = -m_StickToGroundForce;
-
-                if (m_Jump)
-                {
-                    m_MoveDir.y = m_JumpSpeed;
-                    m_Jump = false;
-                    m_Jumping = true;
-                }
-            }
-            else
-            {
-                m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
-            }
-
-            m_CollisionFlags = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
-
-            //ProgressStepCycle(speed);
-            // UpdateCameraPosition(speed);
 
         }
 
@@ -252,13 +225,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         void OnGUI()
         {
+            
 
 
-
-            GUI.Label(new Rect(10, 25, 500, 20), "Transfoem X:" + transform.position.x);
-            GUI.Label(new Rect(10, 50, 500, 20), "Transform Y:" + transform.position.z);
-            GUI.Label(new Rect(10, 75, 500, 20), "isOngroud:" + m_CharacterController.isGrounded);
+            GUI.Label(new Rect(10, 25, 500, 20), "Sensitivity:" + this.rotationSensitivity);
+            GUI.Label(new Rect(10, 50, 500, 20), "Smooth:" + this.rotationSmoothening);
             GUI.Label(new Rect(10, 100, 500, 20), "difference x :" + (transform.position.x - prevTransformPositionX) + " " + "difference y: "+ (transform.position.z - prevTransformPositionZ));
+            GUI.Label(new Rect(10, 125, 500, 20), "leftRight Tilt:" + this.leftRightTilt);
+            GUI.Label(new Rect(10, 150, 500, 20), "upDown Tilt:" + this.upDownTilt);
+
 
             GUI.Box(new Rect(10, 10, Screen.width / 4f, 15), "");
 

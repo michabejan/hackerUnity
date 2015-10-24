@@ -3,6 +3,9 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
+    public int numberOfTiles;
+    public float xRange;
+    public float zOffset;
 
     private bool newGame;
     public Map mapPrefab;
@@ -15,7 +18,7 @@ public class GameManager : MonoBehaviour {
     private void BeginGame()
     {
         map = Instantiate(mapPrefab) as Map;
-        map.proceduralGenerate(30);
+        map.build(numberOfTiles, xRange, zOffset);
         //map.generate(50, 50);
     } 
 }

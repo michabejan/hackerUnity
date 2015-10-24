@@ -4,60 +4,56 @@ using System.Collections.Generic;
 
 public class Map : MonoBehaviour {
 
+    public Tile tilePrefab;
+    public List<Tile> tiles;
+     
+    
 
+    public void build(int numberOfTiles, float xRange, float zOffset)
+    {   
 
+        Tile nextTile = buildFirstTile();
 
-   public Tile tilePrefab;
-
-   public List<Tile> tiles;
-
-
-    public void generate(int sizeX, int sizeY)
-    {
-        tiles = new List<Tile>();
-        for (int x = 0; x < sizeX; x++)
+        
+        for (int i = 0; i < numberOfTiles; ++i)
         {
-            for (int z = 0; z < sizeY; z++)
-            {
-                Tile tile = Instantiate(tilePrefab) as Tile;
-                //      tiles[x, z] = tile;
+            // assign tile from previous iteration as previousTile
+            Tile previousTile = nextTile;       
+            nextTile = buildNextTile(previousTile, xRange, zOffset);
 
-                tile.transform.parent = transform;
-                tile.transform.localPosition = new Vector3(x, 0f, z);
-                tile.name = tile.transform.localPosition.x + " " + " + " + tile.transform.localPosition.z;
-                tiles.Add(tile);
-
-            }
+            
+                    
         }
     }
 
-
-    public void proceduralGenerate(int sizeY)
+    private Tile buildFirstTile()
     {
-        bool t = true;
-        int a = 0;
-        for (int i = 0; i < sizeY; i++)
-        {
-            
-            
-            Tile tile = Instantiate(tilePrefab) as Tile;
-            tile.transform.parent = transform;
-            tile.transform.localPosition = new Vector3(a, 0f, i*2);
-            /*
-            print(a);
-            if (t == true)
-            {
-                a++;
-                t = false;
-            }
-            else
-            {
-                a--;
-                t = true;
-            }
-         */   
-        }
+        Tile tile = Instantiate(tilePrefab) as Tile;
+        //tile.transform.parent = transform;
+        tile.transform.localPosition = new Vector3(0, 0, 0);
 
+        return tile;
+    }
+
+    private Tile buildNextTile(Tile previousTile, float xRange, float zOffset)
+    {
+        Tile nextTile = nextTile = Instantiate(tilePrefab) as Tile;
+
+        Vector3 oldPosition = previousTile.transform.localPosition;
+
+        float newX = Random.Range(oldPosition.x - xRange, oldPosition.x + xRange);
+        float newZ = oldPosition.z + zOffset;
+
+        Vector3 newPosition = new Vector3(newX, 0,  newZ);
+
+        nextTile.transform.localPosition = newPosition;
+        return nextTile;
+    }
+
+
+    private Vector3 getNextVector()
+    {
+        return new Vector3(1, 1, 1);
     }
 
 
